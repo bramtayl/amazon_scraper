@@ -492,6 +492,19 @@ def run_search(browser, department, query, search_results_folder):
                 if len(prime_prices) > 0:
                     product_data["prime_price"] = get_price(only(prime_prices))
 
+        category_navigation_widget = browser.find_elements(By.CSS_SELECTOR, "#wayfinding-breadcrumbs_feature_div")
+
+        if len(category_navigation_widget) > 0:
+            category_links = category_navigation_widget[0].find_elements(
+                By.CSS_SELECTOR, "a[class='a-link-normal a-color-tertiary']"
+            )
+
+            for i, link in enumerate(category_links[:5]):
+                if link and link.text:
+                    product_data[f"sub_category_{i}"] = link.text.replace("\n", "").replace(" ", "")
+                else:
+                    product_data[f"sub_category_{i}"] = None
+
         average_ratings = browser.find_elements(
             By.CSS_SELECTOR,
             ".cr-widget-TitleRatingsHistogram span[data-hook='rating-out-of-text']",
@@ -605,9 +618,10 @@ def download_data(
         # number of sidebar boxes
         # name of the selected sidebar box
         # number of sellers (for items with multiple sellers)
-        # coupons
-        # categories
         # seller name
+        # coupons
+
+        # categories
         # whether eligable for refund
         # whether limited time deal
         # whether small business icon
