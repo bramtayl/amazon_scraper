@@ -77,6 +77,12 @@ def parse_price(price_string):
     # ignore the dollar sign in front
     return float(remove_commas(price_string[1:]))
 
+def parse_shipping_message(s: str) -> float:
+    match = search(r"\$(\d+\.\d{2})", s)
+    if match:
+        return float(match.group(1))
+    else:
+        return 0.0
 
 def get_star_percentage(histogram_row):
     return only(
@@ -442,11 +448,10 @@ def run_search(browser, department, query, search_results_folder):
                     + "#desktop_qualifiedBuyBox #amazonGlobal_feature_div > .a-color-secondary",
                 )
 
-                # TODO: parse the shipping cost message to get a number
                 if len(shipping_cost_messages) > 0:
-                    product_data["shipping_cost_message"] = only(
+                    product_data["shipping_cost_message"] = parse_shipping_message(only(
                         shipping_cost_messages
-                    ).text
+                    ).text)
 
                 standard_delivery_dates = browser.find_elements(
                     By.CSS_SELECTOR,
