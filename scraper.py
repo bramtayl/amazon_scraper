@@ -492,6 +492,18 @@ def run_search(browser, department, query, search_results_folder):
                 if len(prime_prices) > 0:
                     product_data["prime_price"] = get_price(only(prime_prices))
 
+                return_policy_text = browser.find_elements(
+                    By.CSS_SELECTOR, "#productSupportAndReturnPolicy-return-policy-anchor-text"
+                )
+                if len(return_policy_text) > 0:
+                    product_data["return_policy"] = only(return_policy_text).text
+                else:
+                    amazon_renewed_check = browser.find_elements(
+                        By.CSS_SELECTOR, "#bylineInfo_feature_div .a-link-normal"
+                    )
+                    if len(amazon_renewed_check) > 0 and only(amazon_renewed_check).text == "Visit the Amazon Renewed Store":
+                        product_data["return_policy"] = "Amazon Renewed - 90 Day Return Policy"
+
         category_navigation_widget = browser.find_elements(By.CSS_SELECTOR, "#wayfinding-breadcrumbs_feature_div")
 
         if len(category_navigation_widget) > 0:
@@ -621,7 +633,7 @@ def download_data(
         # seller name
         # coupons
 
-        # categories
+        # categories /
         # whether eligable for refund
         # whether limited time deal
         # whether small business icon

@@ -3,6 +3,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait as wait
 from selenium.webdriver.support.expected_conditions import presence_of_element_located as located
 from pandas import DataFrame
+from selenium.webdriver.firefox.options import Options
+
 
 def add_sub_categories(parents, children, browser, parent, child, level):
     child_text = child.text
@@ -24,7 +26,7 @@ def add_sub_categories(parents, children, browser, parent, child, level):
     browser.back()
 
 def get_category_tree(browser):
-    browser.get("https://www.amazon.co.uk/Best-Sellers/zgbs")
+    browser.get("https://www.amazon.com/Best-Sellers/zgbs")
     main_selector = "#zg_left_col2 a"
     wait(browser, 20).until(located((By.CSS_SELECTOR, main_selector)))
     parents = []
@@ -41,7 +43,12 @@ def get_category_tree(browser):
         wait(browser, 20).until(located((By.CSS_SELECTOR, main_selector)))
     return DataFrame({"parent": parents, "child": children})
 
-browser = webdriver.Firefox()
-tree = get_category_tree()
+options = Options()
+#set the browser to headless mode
+#options.headless = True
+options.binary_location = r"C://Program Files//Mozilla Firefox//firefox.exe" #locates the firefox binary
+
+browser = webdriver.Firefox(options=options)
+tree = get_category_tree(browser)
 tree.to_csv("category_tree.csv", index = False)
 browser.quit()
